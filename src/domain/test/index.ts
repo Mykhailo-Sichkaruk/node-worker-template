@@ -1,4 +1,4 @@
-import { Type } from "@sinclair/typebox";
+import { Type, Static } from "@sinclair/typebox";
 
 // Test entity
 export const Test = Type.Object({
@@ -57,6 +57,8 @@ export const TestResult = Type.Intersect([
     testItems: Type.Array(TestItem),
   }),
 ]);
+
+export type TestResult = Static<typeof TestResult>;
 
 // Test Report entity
 export const TestReport = Type.Object({
