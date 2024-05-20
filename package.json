@@ -1,0 +1,34 @@
+{
+  "name": "worker-template",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "imports": {
+    "#*": "./src/*",
+    "#repo/*": "./src/domain/repo/*",
+    "#model/*": "./src/domain/model/*",
+    "#service/*": "./src/domain/service/*",
+    "#impl/repo/*": "./src/application/impl/repo/*",
+    "#impl/service/*": "./src/application/impl/service/*",
+    "#application/*": "./src/application/*"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.32.30",
+    "amqplib": "^0.10.4",
+    "mocha": "^10.4.0",
+    "pino": "^9.1.0",
+    "ts-dotenv": "^0.9.1"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.5",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5"
+  }
+}
