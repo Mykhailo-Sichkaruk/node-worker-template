@@ -4,7 +4,7 @@ import { Type } from '@sinclair/typebox';
 import { connectRabbitMQ, sendTestResultMessage } from './rabbitMqService.js';
 import { TestResult, TestItem } from '#domain/test/index.js';
 import { log } from '#infrastructure/log.js';
-import TapParser from 'tap-parser';
+import { Parser} from 'tap-parser';
 
 const execAsync = promisify(exec);
 
@@ -18,7 +18,7 @@ export async function runTests() {
     }
 
     // Parse TAP output
-    const parser = new TapParser.Parser();
+    const parser = new Parser();
     const testItems: any = [];
     const summary = {
       total: 0,

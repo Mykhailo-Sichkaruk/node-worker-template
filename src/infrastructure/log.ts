@@ -12,7 +12,7 @@ const devTargets = [
   },
 ];
 
-export const log = pino({
+export const log = pino.pino({
   customLevels: {
     system: 100,
     fatal: 60,
@@ -24,6 +24,6 @@ export const log = pino({
   },
   level: "debug",
   transport: {
-    targets: [ ...devTargets ],
+    targets: devTargets,
   },
 });

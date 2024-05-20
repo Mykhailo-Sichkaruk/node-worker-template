@@ -2,6 +2,10 @@
   "name": "worker-template",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
+  "target": "es2023",
+  "module": "es2023",
+  "author": "Mykhailo Sichkaruk",
   "scripts": {
     "compile": "tsc",
     "run-app": "node --experimental-json-modules ./src/index.js",
