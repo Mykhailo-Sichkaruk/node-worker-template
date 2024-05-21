@@ -11,6 +11,7 @@ const readFile = util.promisify(fs.readFile);
 
 export async function runTests() {
   try {
+    log.info('Running tests...');
     // Run tests and output the results to a file
     const { stderr } = await execAsync('node --test --test-reporter tap > test.tap');
     if (stderr) {

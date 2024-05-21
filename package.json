@@ -1,7 +1,7 @@
 {
   "name": "worker-template",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./src/index.js",
   "type": "module",
   "target": "es2023",
   "module": "es2023",
@@ -14,7 +14,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "description": "",
   "imports": {
