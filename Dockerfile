@@ -7,7 +7,6 @@ RUN [ "npm", "ci", "--force" ]
 RUN [ "npm", "audit", "fix", "--force", "--audit-level", "high" ]
 
 COPY [ "./src", "./src" ]
-COPY [ "./test", "./test" ]
 RUN  [ "npm", "run", "compile" ]
 
 RUN [ "npm", "prune", "--omit=dev", "--omit-peer" ]
