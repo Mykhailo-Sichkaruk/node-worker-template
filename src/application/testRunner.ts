@@ -5,19 +5,21 @@ import { connectRabbitMQ, sendTestResultMessage } from './rabbitMqService.js';
 import type { TestItem } from '#domain/test/index.js';
 import { log } from '#infrastructure/log.js';
 import { exec } from 'child_process';
+import env from '#config/env.js';
+import {execa} from "execa";
+
+const {stdout} = await execa`npm run build`;
 
 const execAsync = promisify(exec);
 const readFile = util.promisify(fs.readFile);
 
+// Print command's output
+console.log(stdout);
 export async function runTests() {
   try {
     log.info('Running tests...');
     // Run tests and output the results to a file
-    const { stderr } = await execAsync('node --test --test-reporter tap > test.tap');
-    if (stderr) {
-      log.error(`Test run encountered errors: ${stderr}`);
-      return;
-    }
+     await execa`node --test --test-reporter tap > test.tap`;
 
     // Read the TAP output from the file
     const tapOutput = await readFile('test.tap', 'utf8');
@@ -52,10 +54,10 @@ export async function runTests() {
 
     parser.on('complete', async () => {
       const testResult = {
-        id: 'some-uuid', 
-        project: 'example-project',
+        id: env.TEST_ID,
+        project: env.PROJECT_NAME,
         commitHash: 'example-commit-hash',
-        imageUrl: 'example-image-url',
+        imageUrl: env.TEST_IMAGE_URL,
         status: summary.failed > 0 ? 'fail' : 'pass',
         executedAt: new Date().toISOString(),
         testItems,
@@ -73,3 +75,4 @@ export async function runTests() {
 }
 
 runTests();
+process.exit(0);

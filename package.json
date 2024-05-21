@@ -28,6 +28,7 @@
   "dependencies": {
     "@sinclair/typebox": "^0.32.30",
     "amqplib": "^0.10.4",
+    "execa": "^9.1.0",
     "mocha": "^10.4.0",
     "pino": "^9.1.0",
     "tap-parser": "^15.3.2",
