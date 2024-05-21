@@ -1,25 +1,29 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import { Type } from '@sinclair/typebox';
+import fs from 'fs';
+import util, { promisify } from 'util';
+import { Parser } from 'tap-parser';
 import { connectRabbitMQ, sendTestResultMessage } from './rabbitMqService.js';
-import { TestResult, TestItem } from '#domain/test/index.js';
+import type { TestItem } from '#domain/test/index.js';
 import { log } from '#infrastructure/log.js';
-import { Parser} from 'tap-parser';
+import { exec } from 'child_process';
 
 const execAsync = promisify(exec);
+const readFile = util.promisify(fs.readFile);
 
 export async function runTests() {
   try {
-    // Run tests and get TAP report
-    const { stdout, stderr } = await execAsync('node --test --test-reporter tap');
-
+    // Run tests and output the results to a file
+    const { stderr } = await execAsync('node --test --test-reporter tap > test.tap');
     if (stderr) {
       log.error(`Test run encountered errors: ${stderr}`);
+      return;
     }
+
+    // Read the TAP output from the file
+    const tapOutput = await readFile('test.tap', 'utf8');
 
     // Parse TAP output
     const parser = new Parser();
-    const testItems: any = [];
+    const testItems: TestItem[] = [];
     const summary = {
       total: 0,
       passed: 0,
@@ -27,22 +31,16 @@ export async function runTests() {
     };
 
     parser.on('assert', (assert) => {
-      const testItem = {
+      const testItem: TestItem = {
         id: assert.id.toString(),
         description: assert.name,
         status: assert.ok ? 'pass' : 'fail',
-        directive: assert.diag.directive || null,
-        todo: assert.diag.todo || null,
-        skip: assert.diag.skip || null,
-        error: !assert.ok
-          ? {
-              message: assert.diag.message || 'Test failed',
-              stack: assert.diag.stack || '',
-            }
-          : null,
+        directive: assert.diag?.directive || null,
+        todo: assert.diag?.todo || null,
+        skip: assert.diag?.skip || null,
       };
 
-      testItems.push(Type.Strict(TestItem).check(testItem));
+      testItems.push(testItem);
       summary.total++;
       if (assert.ok) {
         summary.passed++;
@@ -51,10 +49,9 @@ export async function runTests() {
       }
     });
 
-    parser.on('complete', () => {
-      // Validate and prepare test result
-      const testResult: TestResult = {
-        id: 'some-uuid', // Generate or assign a proper UUID
+    parser.on('complete', async () => {
+      const testResult = {
+        id: 'some-uuid', 
         project: 'example-project',
         commitHash: 'example-commit-hash',
         imageUrl: 'example-image-url',
@@ -63,23 +60,15 @@ export async function runTests() {
         testItems,
       };
 
-      Type.Strict(TestResult).check(testResult);
-
-      // Connect to RabbitMQ and send the result
-      connectRabbitMQ()
-        .then(() => sendTestResultMessage(testResult))
-        .then(() => {
-          log.info('Test results sent to the queue successfully');
-        })
-        .catch((error) => {
-          log.error('Error sending test results to the queue:', error);
-        });
+      await connectRabbitMQ();
+      await sendTestResultMessage(testResult);
+      log.info('Test results sent to the queue successfully');
     });
 
-    // Write TAP output to the parser
-    parser.end(stdout);
+    parser.end(tapOutput);
   } catch (error) {
     log.error('Error running tests or sending results:', error);
   }
 }
 
+runTests();

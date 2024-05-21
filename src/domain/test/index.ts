@@ -29,6 +29,8 @@ export const ErrorDetails = Type.Object({
   stack: Type.String(),
 });
 
+export type ErrorDetails = Static<typeof ErrorDetails>;
+
 // Test Item entity
 export const TestItem = Type.Object({
   id: Type.String({ format: "uuid" }),
@@ -40,6 +42,7 @@ export const TestItem = Type.Object({
   error: Type.Optional(ErrorDetails),
 });
 
+export type TestItem = Static<typeof TestItem>;
 // Summary entity
 export const Summary = Type.Object({
   totalTests: Type.Number(),
@@ -67,3 +70,5 @@ export const TestReport = Type.Object({
   summary: Summary,
   createdAt: Type.String({ format: "date-time" }),
 });
+
+export type TestReport = Static<typeof TestReport>;
