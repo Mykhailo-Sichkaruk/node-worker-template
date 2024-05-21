@@ -1,3 +1,4 @@
 import { runTests } from "#application/testRunner.js";
 
-runTests();
+await runTests();
+process.exit(0);

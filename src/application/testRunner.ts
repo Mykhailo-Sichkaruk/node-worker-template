@@ -1,20 +1,11 @@
-import fs from 'fs';
-import util, { promisify } from 'util';
+import fs from 'node:fs/promises';
 import { Parser } from 'tap-parser';
 import { connectRabbitMQ, sendTestResultMessage } from './rabbitMqService.js';
 import type { TestItem } from '#domain/test/index.js';
 import { log } from '#infrastructure/log.js';
-import { exec } from 'child_process';
 import env from '#config/env.js';
 import {execa} from "execa";
 
-const {stdout} = await execa`npm run build`;
-
-const execAsync = promisify(exec);
-const readFile = util.promisify(fs.readFile);
-
-// Print command's output
-console.log(stdout);
 export async function runTests() {
   try {
     log.info('Running tests...');
@@ -22,7 +13,7 @@ export async function runTests() {
      await execa`node --test --test-reporter tap > test.tap`;
 
     // Read the TAP output from the file
-    const tapOutput = await readFile('test.tap', 'utf8');
+    const tapOutput = await fs.readFile('test.tap', 'utf8');
 
     // Parse TAP output
     const parser = new Parser();
@@ -74,5 +65,3 @@ export async function runTests() {
   }
 }
 
-runTests();
-process.exit(0);
